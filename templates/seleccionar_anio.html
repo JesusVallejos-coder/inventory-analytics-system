@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Seleccionar Período | {{ tipo|capitalize }}{% endblock %}
+
+{% block content %}
+<div class="filtro-container" style="max-width: 500px; margin: 0 auto;">
+    <div class="table-container fade-in">
+        <div class="table-header-modern">
+            <div class="table-title-modern">
+                <h2><i class="fas fa-calendar-week me-2" style="color: var(--accent-primary);"></i>Seleccionar Período</h2>
+                <p>{{ tipo|capitalize }}</p>
+            </div>
+        </div>
+
+        <!-- Período Actual -->
+        <div class="alert alert-info mb-4" style="background: var(--accent-soft); border: none; color: var(--accent-primary);">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Período actual:</strong> <span id="currentPeriod"></span>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-error mb-4">
+            <i class="fas fa-exclamation-triangle me-2"></i>{{ error }}
+        </div>
+        {% endif %}
+
+        <!-- Acciones Rápidas -->
+        <div class="row g-2 mb-4">
+            <div class="col-4">
+                <button onclick="setCurrentPeriod()" class="btn-modern btn-secondary-modern w-100" style="padding: 10px;">
+                    <i class="fas fa-clock me-1"></i>Mes Actual
+                </button>
+            </div>
+            <div class="col-4">
+                <button onclick="setPreviousPeriod()" class="btn-modern btn-secondary-modern w-100" style="padding: 10px;">
+                    <i class="fas fa-arrow-left me-1"></i>Mes Anterior
+                </button>
+            </div>
+            <div class="col-4">
+                <button onclick="clearSelection()" class="btn-modern btn-secondary-modern w-100" style="padding: 10px;">
+                    <i class="fas fa-times me-1"></i>Limpiar
+                </button>
+            </div>
+        </div>
+
+        <form method="post">
+            <div class="filtro-opcion" style="background: var(--bg-secondary); border-radius: 15px; padding: 20px; margin-bottom: 20px;">
+                <h5 style="color: var(--accent-primary); margin-bottom: 15px;">
+                    <i class="fas fa-calendar me-2"></i>Seleccionar Mes y Año
+                </h5>
+
+                <div class="mb-3">
+                    <label class="form-label">Año:</label>
+                    <input type="number" name="anio" id="anio" class="form-control"
+                           min="2000" max="2100" placeholder="Ej: 2024" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Mes:</label>
+                    <select name="mes" id="mes" class="form-control" required>
+                        <option value="">-- Seleccionar mes --</option>
+                        <option value="1">Enero</option>
+                        <option value="2">Febrero</option>
+                        <option value="3">Marzo</option>
+                        <option value="4">Abril</option>
+                        <option value="5">Mayo</option>
+                        <option value="6">Junio</option>
+                        <option value="7">Julio</option>
+                        <option value="8">Agosto</option>
+                        <option value="9">Septiembre</option>
+                        <option value="10">Octubre</option>
+                        <option value="11">Noviembre</option>
+                        <option value="12">Diciembre</option>
+                    </select>
+                </div>
+
+                <!-- Grid de meses para selección rápida -->
+                <div class="row g-2 mt-3">
+                    {% set meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'] %}
+                    {% for mes_num in range(1, 13) %}
+                    <div class="col-3 col-sm-2">
+                        <div class="month-option" data-month="{{ mes_num }}"
+                             style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; text-align: center; cursor: pointer; transition: all 0.3s ease; color: var(--text-primary);">
+                            {{ meses[mes_num-1] }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <button type="submit" class="btn-modern btn-primary-modern w-100">
+                <i class="fas fa-chart-line me-2"></i>Generar Reporte
+            </button>
+        </form>
+
+        <div class="text-center mt-4">
+            <a href="{{ url_for('dashboard') }}" class="btn-modern btn-secondary-modern">
+                <i class="fas fa-arrow-left me-2"></i>Volver al Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Configuración inicial
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date();
+    updateCurrentPeriod(today);
+    setCurrentPeriod();
+    initMonthSelection();
+});
+
+function updateCurrentPeriod(date) {
+    const months = [
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    const periodText = `${months[date.getMonth()]} ${date.getFullYear()}`;
+    document.getElementById('currentPeriod').textContent = periodText;
+}
+
+function setCurrentPeriod() {
+    const today = new Date();
+    document.getElementById('anio').value = today.getFullYear();
+    document.getElementById('mes').value = today.getMonth() + 1;
+    updateMonthSelection(today.getMonth() + 1);
+}
+
+function setPreviousPeriod() {
+    const today = new Date();
+    const previousMonth = new Date(today.getFullYear(), today.getMonth() - 1);
+    document.getElementById('anio').value = previousMonth.getFullYear();
+    document.getElementById('mes').value = previousMonth.getMonth() + 1;
+    updateMonthSelection(previousMonth.getMonth() + 1);
+}
+
+function clearSelection() {
+    document.getElementById('anio').value = '';
+    document.getElementById('mes').value = '';
+    updateMonthSelection(null);
+}
+
+function initMonthSelection() {
+    document.querySelectorAll('.month-option').forEach(option => {
+        option.addEventListener('click', function() {
+            const month = this.getAttribute('data-month');
+            document.getElementById('mes').value = month;
+            updateMonthSelection(month);
+        });
+
+        // Estilos hover
+        option.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = 'var(--accent-soft)';
+            this.style.borderColor = 'var(--accent-primary)';
+        });
+
+        option.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = 'var(--bg-card)';
+            this.style.borderColor = 'var(--border-color)';
+        });
+    });
+}
+
+function updateMonthSelection(selectedMonth) {
+    document.querySelectorAll('.month-option').forEach(option => {
+        if (option.getAttribute('data-month') === selectedMonth?.toString()) {
+            option.style.background = 'var(--gradient-primary)';
+            option.style.color = 'white';
+            option.style.borderColor = 'transparent';
+        } else {
+            option.style.background = 'var(--bg-card)';
+            option.style.color = 'var(--text-primary)';
+            option.style.borderColor = 'var(--border-color)';
+        }
+    });
+}
+
+// Actualizar cuando cambie el select
+document.getElementById('mes').addEventListener('change', function() {
+    updateMonthSelection(this.value);
+});
+</script>
+{% endblock %}

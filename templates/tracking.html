@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Tracking por Serial | FlexNet Reports{% endblock %}
+
+{% block content %}
+<div class="tracking-container fade-in" style="max-width: 1200px; margin: 0 auto;">
+    <div class="table-header-modern" style="margin-bottom: 30px;">
+        <div class="table-title-modern">
+            <h2><i class="fas fa-search-location me-3" style="color: var(--accent-primary);"></i>Tracking por Serial</h2>
+            <p>Seguimiento completo de movimientos por número de serie</p>
+        </div>
+    </div>
+
+    <!-- Búsqueda -->
+    <div class="search-card" style="background: var(--bg-card); border-radius: 20px; padding: 30px; margin-bottom: 30px; border: 1px solid var(--border-color);">
+        <h3 style="color: var(--text-primary); margin-bottom: 20px;">
+            <i class="fas fa-barcode me-2" style="color: var(--accent-primary);"></i>
+            Consultar Serial
+        </h3>
+        <form method="POST">
+            <div class="input-group">
+                <input type="text" name="nro_serie" class="form-control form-control-lg"
+                       placeholder="Ingrese el número de serie para rastrear..." required
+                       style="border-radius: 12px 0 0 12px;">
+                <button class="btn-modern btn-primary-modern" type="submit" style="border-radius: 0 12px 12px 0;">
+                    <i class="fas fa-search me-2"></i>Rastrear
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {% if movimientos is not none %}
+        {% if movimientos.empty %}
+            <div class="text-center py-5" style="background: var(--bg-card); border-radius: 20px; border: 1px solid var(--border-color);">
+                <i class="fas fa-search" style="font-size: 4rem; color: var(--text-secondary); margin-bottom: 20px;"></i>
+                <h3 style="color: var(--text-primary);">No se encontraron movimientos</h3>
+                <p style="color: var(--text-secondary);">El número de serie ingresado no tiene movimientos registrados.</p>
+            </div>
+        {% else %}
+            {% set first_row = movimientos.iloc[0] %}
+
+            <!-- Información del Producto -->
+            <div class="product-card" style="background: var(--bg-card); border-radius: 20px; padding: 30px; margin-bottom: 30px; border: 1px solid var(--border-color);">
+                <h3 style="color: var(--accent-primary); margin-bottom: 25px;">
+                    <i class="fas fa-box me-2"></i>Información del Producto
+                </h3>
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <div class="stat-card" style="background: var(--bg-secondary);">
+                            <div class="stat-icon" style="background: var(--accent-soft);">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-label">Cliente</span>
+                                <span class="stat-value" style="font-size: 1rem;">{{ first_row.CLIENTE_ID }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card" style="background: var(--bg-secondary);">
+                            <div class="stat-icon" style="background: var(--accent-soft);">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-label">Producto</span>
+                                <span class="stat-value" style="font-size: 1rem;">{{ first_row.PRODUCTO_ID }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stat-card" style="background: var(--bg-secondary);">
+                            <div class="stat-icon" style="background: var(--accent-soft);">
+                                <i class="fas fa-tag"></i>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-label">Descripción</span>
+                                <span class="stat-value" style="font-size: 1rem;">{{ first_row.DESCR_PRODUCTO }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historial de Movimientos -->
+            <div class="table-container">
+                <h3 style="color: var(--accent-primary); margin-bottom: 20px;">
+                    <i class="fas fa-history me-2"></i>Historial de Movimientos
+                </h3>
+                <table class="table" id="trackingTable">
+                    <thead>
+                        <tr>
+                            <th>Tipo Operación</th>
+                            <th>Fecha</th>
+                            <th>Ubicación</th>
+                            <th>Cantidad</th>
+                            <th>N° Remito</th>
+                            <th>Nombre</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for _, row in movimientos.iterrows() %}
+                        <tr>
+                            <td>
+                                <span class="badge bg-{% if row.TIPO_OPERACION == 'Ingresos' %}success{% elif row.TIPO_OPERACION == 'Egresos' %}danger{% else %}info{% endif %} p-2">
+                                    {{ row.TIPO_OPERACION }}
+                                </span>
+                            </td>
+                            <td>{{ row.F_OPERACION }}</td>
+                            <td>{{ row.UBICACION }}</td>
+                            <td class="text-{% if row.TIPO_OPERACION == 'Ingresos' %}success{% elif row.TIPO_OPERACION == 'Egresos' %}danger{% endif %} fw-bold">
+                                {{ row.CANTIDAD }}
+                            </td>
+                            <td>{{ row.NRO_REMITO }}</td>
+                            <td>{{ row.NOMBRE }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+<script>
+$(document).ready(function() {
+    if ($('#trackingTable').length) {
+        $('#trackingTable').DataTable({
+            pageLength: 25,
+            language: {
+                url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json"
+            },
+            order: [[1, 'asc']]
+        });
+    }
+});
+</script>
+{% endblock %}

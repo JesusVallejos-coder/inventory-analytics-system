@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Filtro de Fechas | {{ tipo.capitalize().replace('_', ' ') }}{% endblock %}
+
+{% block content %}
+<div class="filtro-container" style="max-width: 500px; margin: 0 auto;">
+    <div class="table-container fade-in">
+        <div class="table-header-modern">
+            <div class="table-title-modern">
+                <h2><i class="fas fa-calendar-alt me-2" style="color: var(--accent-primary);"></i>Filtro de Fechas</h2>
+                <p>{{ tipo.capitalize().replace('_', ' ') }}</p>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-error mb-4">
+            <i class="fas fa-exclamation-triangle me-2"></i>{{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST">
+            <!-- Opción 1: Año y Mes -->
+            <div class="filtro-opcion" style="background: var(--bg-secondary); border-radius: 15px; padding: 20px; margin-bottom: 20px;">
+                <h5 style="color: var(--accent-primary); margin-bottom: 15px;">
+                    <i class="fas fa-calendar-week me-2"></i>Filtrar por Mes Específico
+                </h5>
+
+                <div class="mb-3">
+                    <label class="form-label">Año:</label>
+                    <input type="number" name="anio" id="anio" class="form-control"
+                           min="2000" max="2100" placeholder="Ej: 2024">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Mes:</label>
+                    <select name="mes" id="mes" class="form-control">
+                        <option value="">-- Seleccionar mes --</option>
+                        <option value="1">Enero</option>
+                        <option value="2">Febrero</option>
+                        <option value="3">Marzo</option>
+                        <option value="4">Abril</option>
+                        <option value="5">Mayo</option>
+                        <option value="6">Junio</option>
+                        <option value="7">Julio</option>
+                        <option value="8">Agosto</option>
+                        <option value="9">Septiembre</option>
+                        <option value="10">Octubre</option>
+                        <option value="11">Noviembre</option>
+                        <option value="12">Diciembre</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="text-center my-4">
+                <span class="badge bg-secondary p-3 rounded-circle">O</span>
+            </div>
+
+            <!-- Opción 2: Rango de Fechas -->
+            <div class="filtro-opcion" style="background: var(--bg-secondary); border-radius: 15px; padding: 20px; margin-bottom: 20px;">
+                <h5 style="color: var(--accent-primary); margin-bottom: 15px;">
+                    <i class="fas fa-calendar-day me-2"></i>Filtrar por Rango Personalizado
+                </h5>
+
+                <div class="mb-3">
+                    <label class="form-label">Fecha Inicio:</label>
+                    <input type="date" name="desde" id="desde" class="form-control">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Fecha Fin:</label>
+                    <input type="date" name="hasta" id="hasta" class="form-control">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-modern btn-primary-modern w-100">
+                <i class="fas fa-search me-2"></i>Ejecutar Consulta
+            </button>
+        </form>
+
+        <div class="text-center mt-4">
+            <a href="{{ url_for('dashboard') }}" class="btn-modern btn-secondary-modern">
+                <i class="fas fa-arrow-left me-2"></i>Volver al Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Establecer valores por defecto
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    document.getElementById('desde').value = firstDay.toISOString().split('T')[0];
+    document.getElementById('hasta').value = today.toISOString().split('T')[0];
+    document.getElementById('anio').value = today.getFullYear();
+    document.getElementById('mes').value = today.getMonth() + 1;
+});
+</script>
+{% endblock %}

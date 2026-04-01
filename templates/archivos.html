@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archivos - {{ ciclico }} | Sistema de Consultas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        :root {
+            --primary-orange: #ff7e5f;
+            --secondary-orange: #feb47b;
+            --light-orange: #ffecd2;
+            --dark-orange: #d35400;
+            --success-green: #27ae60;
+            --info-blue: #2980b9;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--light-orange) 0%, #fcb69f 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .archivos-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            padding: 40px;
+            margin: 0 auto;
+            max-width: 900px;
+            border: 1px solid rgba(255,255,255,0.3);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .archivos-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 126, 95, 0.2);
+        }
+
+        .archivos-icon {
+            font-size: 3rem;
+            color: var(--dark-orange);
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .archivos-title {
+            color: var(--dark-orange);
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .archivos-subtitle {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        .periodo-badge {
+            background: linear-gradient(135deg, var(--light-orange), #ffd7c2);
+            color: var(--dark-orange);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .files-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .files-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f8f9fa;
+        }
+
+        .files-icon {
+            font-size: 2rem;
+            color: var(--dark-orange);
+        }
+
+        .files-title {
+            color: var(--dark-orange);
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .files-count {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .file-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .file-card:hover {
+            background: var(--light-orange);
+            border-color: var(--primary-orange);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .file-icon {
+            font-size: 2rem;
+            color: var(--dark-orange);
+            width: 40px;
+            text-align: center;
+        }
+
+        .file-content {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: var(--dark-orange);
+            font-size: 1rem;
+            margin-bottom: 5px;
+            word-break: break-word;
+        }
+
+        .file-desc {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, var(--success-green), #2ecc71);
+            border: none;
+            border-radius: 10px;
+            padding: 8px 15px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+            color: white;
+        }
+
+        .empty-state {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, var(--dark-orange), #e67e22);
+            border: none;
+            border-radius: 15px;
+            padding: 12px 30px;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(211, 84, 0, 0.4);
+            color: white;
+        }
+
+        .back-container {
+            text-align: center;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, var(--light-orange), #ffd7c2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--dark-orange);
+        }
+
+        .info-box i {
+            color: var(--dark-orange);
+            margin-right: 10px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .archivos-container {
+                padding: 25px 15px;
+                margin: 10px;
+            }
+
+            .archivos-title {
+                font-size: 1.6rem;
+            }
+
+            .files-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .file-card {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="archivos-container">
+        <!-- Header -->
+        <div class="archivos-header">
+            <i class="fas fa-file-alt archivos-icon"></i>
+            <h1 class="archivos-title">Archivos de Inventario</h1>
+            <p class="archivos-subtitle">Descargue los archivos disponibles</p>
+            <div class="periodo-badge">
+                <i class="fas fa-folder me-2"></i>Período: {{ ciclico }}
+            </div>
+        </div>
+
+        <!-- Información -->
+        <div class="info-box">
+            <i class="fas fa-info-circle"></i>
+            <strong>Información:</strong> Haga clic en cualquier archivo para descargarlo. Los archivos están en formato Excel/PDF.
+        </div>
+
+        <!-- Lista de Archivos -->
+        <div class="files-section">
+            <div class="files-header">
+                <i class="fas fa-file-download files-icon"></i>
+                <div>
+                    <h2 class="files-title">Archivos Disponibles</h2>
+                    <div class="files-count">{{ archivos|length }} archivo(s) encontrado(s)</div>
+                </div>
+            </div>
+
+            {% if archivos %}
+            <div class="files-grid">
+                {% for archivo in archivos %}
+                <a href="{{ url_for('descargar_archivo', ciclico=ciclico, archivo=archivo) }}" class="file-card">
+                    <i class="fas
+                        {% if archivo.lower().endswith('.xlsx') or archivo.lower().endswith('.xls') %}fa-file-excel
+                        {% elif archivo.lower().endswith('.pdf') %}fa-file-pdf
+                        {% elif archivo.lower().endswith('.doc') or archivo.lower().endswith('.docx') %}fa-file-word
+                        {% else %}fa-file{% endif %} file-icon">
+                    </i>
+                    <div class="file-content">
+                        <div class="file-name">{{ archivo }}</div>
+                        <div class="file-desc">
+                            {% if archivo.lower().endswith('.xlsx') or archivo.lower().endswith('.xls') %}
+                            Archivo Excel
+                            {% elif archivo.lower().endswith('.pdf') %}
+                            Documento PDF
+                            {% elif archivo.lower().endswith('.doc') or archivo.lower().endswith('.docx') %}
+                            Documento Word
+                            {% else %}
+                            Archivo
+                            {% endif %}
+                        </div>
+                    </div>
+                    <button class="download-btn" onclick="event.preventDefault(); window.location.href='{{ url_for('descargar_archivo', ciclico=ciclico, archivo=archivo) }}'">
+                        <i class="fas fa-download me-1"></i>Descargar
+                    </button>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <!-- Estado vacío -->
+            <div class="empty-state">
+                <i class="fas fa-file-excel empty-icon"></i>
+                <h3 class="text-muted">No hay archivos disponibles</h3>
+                <p class="text-muted">No se encontraron archivos en este período de inventario.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Botón Volver -->
+        <div class="back-container">
+            <a href="{{ url_for('listar_ciclicos') }}" class="btn btn-back">
+                <i class="fas fa-arrow-left me-2"></i>Volver
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Efectos de hover para los archivos
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileCards = document.querySelectorAll('.file-card');
+            fileCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px)';
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

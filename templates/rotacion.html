@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotación de Inventario | Sistema de Consultas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        :root {
+            --primary-orange: #ff7e5f;
+            --secondary-orange: #feb47b;
+            --light-orange: #ffecd2;
+            --dark-orange: #d35400;
+            --success-green: #28a745;
+            --info-blue: #17a2b8;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--light-orange) 0%, #fcb69f 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .rotation-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid rgba(255,255,255,0.3);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .rotation-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 126, 95, 0.2);
+        }
+
+        .rotation-icon {
+            font-size: 3rem;
+            color: var(--primary-orange);
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .rotation-title {
+            color: var(--dark-orange);
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .rotation-subtitle {
+            color: #6c757d;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-control {
+            border-radius: 12px;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 0.2rem rgba(255, 126, 95, 0.25);
+        }
+
+        .btn-rotation {
+            background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-weight: 600;
+            font-size: 16px;
+            color: white;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-rotation:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 126, 95, 0.4);
+        }
+
+        .date-range-info {
+            background: linear-gradient(135deg, #e8f4f8, #d1ecf1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--info-blue);
+        }
+
+        .date-range-info i {
+            color: var(--info-blue);
+            margin-right: 10px;
+        }
+
+        .quick-periods {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .period-btn {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .period-btn:hover {
+            background: var(--light-orange);
+            border-color: var(--primary-orange);
+            transform: translateY(-2px);
+        }
+
+        .period-btn i {
+            margin-right: 5px;
+            color: var(--primary-orange);
+        }
+
+        .date-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .back-link a {
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .back-link a:hover {
+            color: var(--primary-orange);
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, var(--light-orange), #ffd7c2);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .info-box i {
+            color: var(--primary-orange);
+            margin-right: 8px;
+        }
+
+        @media (max-width: 576px) {
+            .rotation-container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+
+            .rotation-title {
+                font-size: 1.5rem;
+            }
+
+            .date-inputs {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-periods {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="rotation-container">
+        <!-- Header -->
+        <div class="rotation-header">
+            <i class="fas fa-retweet rotation-icon"></i>
+            <h1 class="rotation-title">Rotación de Inventario</h1>
+            <p class="rotation-subtitle">
+                Análisis de Egresos vs Ingresos<br>
+                <small>Exporte un reporte detallado en Excel</small>
+            </p>
+        </div>
+
+        <!-- Información del Reporte -->
+        <div class="date-range-info">
+            <i class="fas fa-info-circle"></i>
+            <strong>Reporte de Rotación:</strong> Este análisis compara los egresos con las fechas de ingreso
+            para determinar la antigüedad del inventario vendido. El reporte se puede realizar solo con productos seriados.
+        </div>
+
+        <form method="POST">
+            <!-- Períodos Rápidos -->
+            <div class="quick-periods">
+                <div class="period-btn" onclick="setLast30Days()">
+                    <i class="fas fa-calendar-week"></i>Últimos 30 días
+                </div>
+                <div class="period-btn" onclick="setCurrentMonth()">
+                    <i class="fas fa-calendar-alt"></i>Mes Actual
+                </div>
+                <div class="period-btn" onclick="setLastMonth()">
+                    <i class="fas fa-arrow-left"></i>Mes Anterior
+                </div>
+                <div class="period-btn" onclick="setLast90Days()">
+                    <i class="fas fa-chart-line"></i>Últimos 90 días
+                </div>
+            </div>
+
+            <!-- Inputs de Fecha -->
+            <div class="date-inputs">
+                <div class="form-group">
+                    <label class="form-label" for="fecha_inicio">
+                        <i class="fas fa-play me-2"></i>Fecha Inicio:
+                    </label>
+                    <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="fecha_fin">
+                        <i class="fas fa-flag me-2"></i>Fecha Fin:
+                    </label>
+                    <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" required>
+                </div>
+            </div>
+
+            <!-- Información Adicional -->
+            <div class="info-box">
+                <i class="fas fa-lightbulb"></i>
+                <strong>Tip:</strong> Seleccione un período para analizar la rotación de inventario.
+                El reporte incluirá la antigüedad de los productos vendidos.
+            </div>
+
+            <button type="submit" class="btn-rotation">
+                <i class="fas fa-file-excel me-2"></i>Generar Reporte Excel
+            </button>
+        </form>
+
+        <div class="back-link">
+            <a href="{{ url_for('dashboard') }}">
+                <i class="fas fa-arrow-left me-2"></i>Volver al Panel de Control
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Configuración inicial
+        document.addEventListener('DOMContentLoaded', function() {
+            setCurrentMonth(); // Establecer mes actual por defecto
+        });
+
+        function setLast30Days() {
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(endDate.getDate() - 30);
+
+            document.getElementById('fecha_inicio').value = startDate.toISOString().split('T')[0];
+            document.getElementById('fecha_fin').value = endDate.toISOString().split('T')[0];
+        }
+
+        function setCurrentMonth() {
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+            document.getElementById('fecha_inicio').value = firstDay.toISOString().split('T')[0];
+            document.getElementById('fecha_fin').value = today.toISOString().split('T')[0];
+        }
+
+        function setLastMonth() {
+            const today = new Date();
+            const firstDayLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+            const lastDayLastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+
+            document.getElementById('fecha_inicio').value = firstDayLastMonth.toISOString().split('T')[0];
+            document.getElementById('fecha_fin').value = lastDayLastMonth.toISOString().split('T')[0];
+        }
+
+        function setLast90Days() {
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(endDate.getDate() - 90);
+
+            document.getElementById('fecha_inicio').value = startDate.toISOString().split('T')[0];
+            document.getElementById('fecha_fin').value = endDate.toISOString().split('T')[0];
+        }
+
+        // Validación: Fecha fin no puede ser menor que fecha inicio
+        document.getElementById('fecha_fin').addEventListener('change', function() {
+            const startDate = new Date(document.getElementById('fecha_inicio').value);
+            const endDate = new Date(this.value);
+
+            if (endDate < startDate) {
+                alert('La fecha fin no puede ser anterior a la fecha inicio');
+                this.value = document.getElementById('fecha_inicio').value;
+            }
+        });
+    </script>
+</body>
+</html>

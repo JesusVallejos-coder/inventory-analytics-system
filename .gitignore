@@ -1,0 +1,39 @@
+# Entornos virtuales
+venv/
+.venv/
+env/
+
+# Archivos de entorno
+.env
+.env.local
+
+# Datos sensibles
+usuarios.json
+usuarios_backup_*.json
+accesos.log
+
+# Archivos compilados
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+logs/
+
+# Archivos de inventario (datos reales)
+Inventario/
+
+# IDE
+.idea/
+.vscode/
+
+# Docker
+.dockerignore
+
+# Archivos temporales
+*.tmp
+*.bak
+*.swp
+
+# ngrok
+ngrok.exe
